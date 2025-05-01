@@ -1,5 +1,5 @@
 DDG prediction
-**Structure-aware prediction of Mutational effects in SKEMPI 2.0 data base using deep learning
+**Structure-aware prediction of mutational effects in SKEMPI 2.0 database using deep learning
 
 ## Changelog
 1/5 - Added ability to save model, minor fixes.  
