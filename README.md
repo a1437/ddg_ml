@@ -1,17 +1,20 @@
 DDG prediction
 **Structure-aware prediction of Mutational effects in SKEMPI 2.0 data base using deep learning
 
-#Changelog
-
-26/4 - Initial commit, prediction only from facebook ESM embeddings
-27/4 - Added struture awareness
-1/5 - Added ability to save model, minor fixes.
+## Changelog
+1/5 - Added ability to save model, minor fixes.  
+27/4 - Added struture awareness  
+26/4 - Initial commit, prediction only from facebook ESM embeddings  
 
 
 
 ## Dependencies
+Running on python version 3.10. Notable  dependancies for running the model training script:  
+```
+conda install -c conda-forge boost=1.73  
+conda install -c salilab dssp
+```
 
-The default PyTorch version is 1.8.1 and cudatoolkit version is 11.3. They can be changed in `environment.yml`.
 
 
 
