@@ -1,10 +1,7 @@
 DDG prediction
 **Structure-aware prediction of mutational effects in SKEMPI 2.0 database using deep learning
 
-## Changelog
-1/5 - Added ability to save model, minor fixes.  
-27/4 - Added struture awareness  
-26/4 - Initial commit, prediction only from facebook ESM embeddings  
+
 
 
 
@@ -34,5 +31,9 @@ conda install -c salilab dssp
 python -B train.py
 ```
 
-The customized hyperparameters  are available in `./configs/param_config.json`.
+## Changelog
+2/5 Added script for tuning ESM model, predicting using saved model
+1/5 - Added ability to save model, minor fixes.  
+27/4 - Added struture awareness  
+26/4 - Initial commit, prediction only from facebook ESM embeddings  
 
