@@ -14,48 +14,6 @@ import warnings
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 warnings.filterwarnings("ignore")
 
-import random
-def set_torch_deterministic(seed=42):
-    # Set Python's random seed
-    random.seed(seed)
-    
-    # Set NumPy's random seed
-    np.random.seed(seed)
-    
-    # Set PyTorch's random seed
-    torch.manual_seed(seed)
-    
-    # Set CUDA's random seed (if available)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-    
-    # Make CUDA operations deterministic
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    
-    # Try using deterministic algorithms (PyTorch 1.8+)
-    # Note: This may slow down your code or raise errors for operations
-    # that don't have deterministic implementations
-    try:
-        torch.use_deterministic_algorithms(True)
-    except AttributeError:
-        # Fallback for older PyTorch versions
-        torch.set_deterministic(True)
-    
-    # Set environment variables
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
-set_torch_deterministic()
-# Set seeds
-torch.manual_seed(0)
-np.random.seed(0)
-random.seed(0)
-
-torch.cuda.manual_seed_all(0)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
-torch.use_deterministic_algorithms(True)
 
 
 #esm_model = EsmModel.from_pretrained("facebook/esm2_t6_8M_UR50D")
@@ -65,7 +23,6 @@ esm_model = AutoModelForSequenceClassification.from_pretrained("esm2_ddg_finetun
 tokenizer = AutoTokenizer.from_pretrained("esm2_ddg_finetuned")
 esm_model.eval()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#device = torch.device("cpu")
 esm_model.to(device)
 
 
@@ -153,10 +110,6 @@ def verify_mutation(sequence, wt, pos):
     return True
 
 
-
-
-
-
 def get_combined_features(wt_sequence, mutation, position, pdb_file, chain_id,wt):
     """Combine ESM embeddings with structure-based features."""
     # Parse mutation format
@@ -165,7 +118,6 @@ def get_combined_features(wt_sequence, mutation, position, pdb_file, chain_id,wt
     mt = mutation
     pos = position  # 1-indexed position
     
-    # Verify wild-type residue
 
     
     # Apply mutation
@@ -175,8 +127,6 @@ def get_combined_features(wt_sequence, mutation, position, pdb_file, chain_id,wt
     
     # Calculate embedding difference
     embedding_diff = get_esm_embedding(full_seq)
-
-    
 
     
     # Combine all features
