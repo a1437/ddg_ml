@@ -1,0 +1,7 @@
+Mutation: L38G
+PDB file: 1ACB
+Chain: I
+Position: 38
+Wild-type: L
+Mutant: G
+Predicted ΔΔG: 5.791 kcal/mol
