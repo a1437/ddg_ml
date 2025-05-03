@@ -265,17 +265,23 @@ def main():
            
     prediction = predict_ddg(X,args.model)
 
+    if(prediction > 0):
+        sign = "- (minus)"
+    elif(prediction<0):
+        sign = '+ (plus)'
+
     
     # Print result
     print(f"\nPrediction Results:")
     print(f"Mutation: {args.mutation}")
-    print(f"Predicted ΔΔG: {prediction:.3f} kcal/mol")
+    print(f"Predicted ΔΔG: {prediction:.3f} kcal/mol, знаĸ изменения: {sign}")
     if(args.mt_af != None and args.wt_af != None):
         mt_dg = float(args.mt_af)
         wt_dg = float(args.wt_af)
         actual = ((8.314/4184)*(273.15 + 25.0)* np.log(mt_dg)) - ((8.314/4184)*(273.15 + 25.0)* np.log(wt_dg))
         print(f"Actual ΔΔG: {actual:.3f} kcal/mol")
     
+
     # Write to output file
     with open(args.output, 'w') as f:
         f.write(f"Mutation: {args.mutation}\n")
@@ -284,7 +290,7 @@ def main():
         f.write(f"Position: {pos}\n")
         f.write(f"Wild-type: {wt}\n")
         f.write(f"Mutant: {mt}\n")
-        f.write(f"Predicted ΔΔG: {prediction:.3f} kcal/mol\n")
+        f.write(f"Predicted ΔΔG: {prediction:.3f} kcal/mol\n, знаĸ изменения: {sign}")
     
     print(f"\nResults saved to {args.output}")
 
