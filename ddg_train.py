@@ -21,13 +21,18 @@ import pickle
 os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 
-df = pd.read_csv("skempi_v2.csv",sep=';')  # should have: sequence, position, wild, mutant, ddg
+df = pd.read_csv("skempi_v2.csv",sep=';')
 
-# Load the ESM model and tokenizer from HuggingFace
+# Load the ESM model and tokenizer from HuggingFace, uncomment the two lines right below to train 
+#model using ESM model directly without any tuning
+
 #tokenizer = EsmTokenizer.from_pretrained("facebook/esm2_t6_8M_UR50D")
 #model = EsmModel.from_pretrained("facebook/esm2_t6_8M_UR50D")
+
+#comment the next two lines if you want to use ESM models straight from Facebook
 model = AutoModelForSequenceClassification.from_pretrained("esm2_ddg_finetuned")
 tokenizer = AutoTokenizer.from_pretrained("esm2_ddg_finetuned")
+
 model.eval()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
@@ -88,7 +93,6 @@ def get_combined_features(wt_sequence, mutation, position, pdb_file, chain_id,wt
     embedding_diff = get_esm_embedding(full_seq)
     
     # Get structure-based features
-    # Combine all features
     structure_features = []
     
     # Add simple physicochemical features about the mutation
@@ -128,6 +132,7 @@ labels = []
 print("Preprocessing...")
 
 for idx, row in tqdm(df.iterrows()):
+    # Drop rows that contain more than one mutation
     if ',' in row['Mutation(s)_cleaned']:
         continue
     pdb_id = row['#Pdb'][0:4]
