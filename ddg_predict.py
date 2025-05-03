@@ -15,12 +15,14 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 warnings.filterwarnings("ignore")
 
 
-
+#uncomment next two lines to use original model
 #esm_model = EsmModel.from_pretrained("facebook/esm2_t6_8M_UR50D")
 #tokenizer = EsmTokenizer.from_pretrained("facebook/esm2_t6_8M_UR50D")
 
+#comment next two lines to not use the fine tuned model
 esm_model = AutoModelForSequenceClassification.from_pretrained("esm2_ddg_finetuned")
 tokenizer = AutoTokenizer.from_pretrained("esm2_ddg_finetuned")
+
 esm_model.eval()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 esm_model.to(device)
@@ -55,11 +57,11 @@ def parse_args():
     parser.add_argument('--mutation', type=str, required=True, 
                         help='Mutation in format like "A123G" (wild-type, position, mutant)')
     parser.add_argument('--model', type=str, required=True, help='Path to saved model pickle file')
-    parser.add_argument('--chain', type=str, default=None, help='Chain ID (optional, can be inferred from mutation)')
+    parser.add_argument('--chain', type=str, required=True, help='Chain ID')
     parser.add_argument('--output', type=str, default='prediction_result.txt', help='Output file for prediction result')
     parser.add_argument('--verbose', action='store_true', help='Print verbose output')
-    parser.add_argument('--mt_af', type=str, default=None, help='Chain ID (optional, can be inferred from mutation)')
-    parser.add_argument('--wt_af', type=str, default=None, help='Chain ID (optional, can be inferred from mutation)')
+    parser.add_argument('--mt_af', type=str, default=None, help='mutant affinity')
+    parser.add_argument('--wt_af', type=str, default=None, help='wild-type affinity')
     
     return parser.parse_args()
 
@@ -147,7 +149,7 @@ def get_combined_features(wt_sequence, mutation, position, pdb_file, chain_id,wt
         'M': 162.9, 'F': 189.9, 'P': 112.7, 'S': 89.0, 'T': 116.1, 'W': 227.8, 
         'Y': 193.6, 'V': 140.0
     }
-    
+                       
     # Add mutation-specific features
     structure_features.append(hydrophobicity.get(wt, 0))
     structure_features.append(hydrophobicity.get(mt, 0))
@@ -196,18 +198,13 @@ def predict_ddg(feature_vector,mdl):
     """
     Predict ΔΔG for a given mutation using the trained model.
     
-    Args:
-        wt_sequence (str): Wild-type protein sequence
-        mutation (str): Mutation in format 'A123G'
-        model_path (str): Path to saved model
-    
-    Returns:
-        float: Predicted ΔΔG value
+
     """
     # Load model
     checkpoint = torch.load(mdl)
     input_dim = checkpoint['input_dim']
     
+    #load saved scaler
     with open('ddg_scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
     
