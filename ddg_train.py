@@ -24,7 +24,7 @@ os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 df = pd.read_csv("skempi_v2.csv",sep=';')
 
 # Load the ESM model and tokenizer from HuggingFace, uncomment the two lines right below to train 
-#model using ESM model directly without any tuning
+#model using ESM embeddings directly without any tuning
 
 #tokenizer = EsmTokenizer.from_pretrained("facebook/esm2_t6_8M_UR50D")
 #model = EsmModel.from_pretrained("facebook/esm2_t6_8M_UR50D")
@@ -53,6 +53,12 @@ def get_chain_sequence(pdb_id, chain_id):
                     sequence += str(pp.get_sequence())
                 return sequence
     return None
+
+"""
+The raw sequence we get from PDB file cannot just be fed into the deep neural network,
+as then it will just be interpreted as a normal string. ESM (Evolutionary Scale Modeling)
+embeddings are used to create numerical vector representations of protein sequences.
+"""
 def get_esm_embedding(seq: str) -> torch.Tensor:
     """
     Generate mean-pooled embedding from a WT + [SEP] + MT sequence.
@@ -131,6 +137,8 @@ feat = []
 labels = []
 print("Preprocessing...")
 
+#Preprocessing data from the skempi CSV file to create feature vectors and lables (ddG)
+
 for idx, row in tqdm(df.iterrows()):
     # Drop rows that contain more than one mutation
     if ',' in row['Mutation(s)_cleaned']:
@@ -148,6 +156,8 @@ for idx, row in tqdm(df.iterrows()):
 
 
     feature_vector = get_combined_features(sequence,row['Mutation(s)_cleaned'][-1],pos,pdb_file,chain_id,row['Mutation(s)_cleaned'][0])
+
+    #ΔΔG = ΔGmut-ΔGwt, ΔG = (8.314/4184)*(273.15 + 25.0) * ln(wt/mt)
     ddg = ((8.314/4184)*(273.15 + 25.0)* np.log(row['Affinity_mut_parsed'])) - ((8.314/4184)*(273.15 + 25.0)* np.log(row['Affinity_wt_parsed']))
     if pd.isna(ddg):
         ddg = 0
